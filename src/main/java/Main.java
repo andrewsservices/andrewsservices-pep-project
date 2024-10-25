@@ -1,6 +1,7 @@
 import Controller.SocialMediaController;
 import DAO.AccountDAO;
 import io.javalin.Javalin;
+import Util.ConnectionUtil;
 
 import Model.Account;
 
@@ -14,10 +15,8 @@ public class Main {
         Javalin app = controller.startAPI();
         app.start(8080);
 
+        ConnectionUtil.resetTestDatabase();
 
-        AccountDAO accountDAO = new AccountDAO();
-
-        System.out.println(accountDAO.getAllAccounts());
 
     }
 }

@@ -2,7 +2,10 @@ package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import Model.Account;
 import Service.AccountService;
 
 /**
@@ -24,6 +27,8 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.get("/accounts", this::getAccountsHandler);
+        app.post("/register", this::registerAccountHandler);
+        app.post("/login", this::loginHandler);
 
         return app;
     }
@@ -32,8 +37,33 @@ public class SocialMediaController {
      * This is an example handler for an example endpoint.
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
+
+     private void registerAccountHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account addedAccount = accountService.addAccount(account);
+        if(addedAccount==null){
+            ctx.status(400);
+        }else{
+            ctx.json(mapper.writeValueAsString(addedAccount));
+        }
+    }
+
+
     private void getAccountsHandler(Context context) {
         context.json(accountService.getAllAccounts());
+    }
+
+    private void loginHandler(Context context)throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account accountToVerify = mapper.readValue(context.body(), Account.class);
+        Account verifiedAccount = accountService.verifyAccount(accountToVerify);
+        System.out.println("verified account: " + verifiedAccount);
+        if(verifiedAccount != null){
+            context.json(mapper.writeValueAsString(verifiedAccount));
+        }else{
+            context.status(401);
+        }
     }
 
 
