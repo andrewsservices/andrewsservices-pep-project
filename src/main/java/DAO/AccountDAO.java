@@ -1,13 +1,7 @@
 package DAO;
-
 import Util.ConnectionUtil;
-
 import java.util.List;
-
 import Model.Account;
-
-
-
 import java.sql.*;
 import java.util.ArrayList;
 

@@ -24,6 +24,16 @@ public class AccountService {
         return accountDAO.getAllAccounts();
     }
 
+    public int[] getAccountIds(){
+        List<Account> accounts = accountDAO.getAllAccounts();
+        int[] accountIds = new int[accounts.size()];
+        
+        for(int i = 0; i < accounts.size(); i++){
+            accountIds[i] = accounts.get(i).getAccount_id();
+        }
+        return accountIds;
+    }
+
     public Account addAccount(Account account){
         String userName = account.getUsername();
         String passWord = account.getPassword();
@@ -44,8 +54,6 @@ public class AccountService {
         List<Account> accounts = accountDAO.getAllAccounts();
         for(Account a: accounts){
             if(a.getUsername().equals(username) && a.getPassword().equals(password)){
-                System.out.println("matched account: " + a);
-                
                return a;
             }
         }
