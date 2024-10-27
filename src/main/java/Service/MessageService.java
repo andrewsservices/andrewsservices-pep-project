@@ -49,4 +49,11 @@ public class MessageService {
 
     }
 
+    public Message updateMessage(Message message, String messageText){
+        if(messageText.length() > 0 && messageText.length() < 225){
+            return messageDAO.updateMessage(message,messageText);
+        }
+        return null;
+    }
+
 }

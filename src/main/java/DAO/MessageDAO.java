@@ -2,6 +2,8 @@ package DAO;
 import Util.ConnectionUtil;
 import java.util.List;
 
+
+
 import Model.Message;
 import java.sql.*;
 import java.util.ArrayList;
@@ -69,5 +71,29 @@ public class MessageDAO {
             System.out.println(ex.getMessage());
         }
         return retrievedMessage;
+    }
+
+    public Message updateMessage(Message message, String messageText){
+        Connection connection = ConnectionUtil.getConnection();
+        
+        try{
+            String sql = "UPDATE message SET message_text = (?) WHERE message_id = (?)";
+            PreparedStatement ps = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1,messageText);
+            ps.setInt(2,message.getMessage_id());
+
+            ps.executeUpdate();
+            ResultSet pkeyResultSet = ps.getGeneratedKeys();
+            while(pkeyResultSet.next()){
+                return new Message(message.getMessage_id(), message.getPosted_by()
+                ,messageText,message.getTime_posted_epoch());
+            }
+        }catch(SQLException ex){
+            System.out.println(ex.getMessage());
+        }
+
+
+
+        return null;
     }
 }

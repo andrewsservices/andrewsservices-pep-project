@@ -2,6 +2,8 @@ package DAO;
 import Util.ConnectionUtil;
 import java.util.List;
 import Model.Account;
+import Model.Message;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -49,5 +51,25 @@ public class AccountDAO {
     }
 
 
+    public Account getAccountById(int accountId){
+        Connection connection = ConnectionUtil.getConnection();
+        Account retrievedAccount = new Account();
+        try{
+            String sql = "SELECT * FROM account WHERE account_id = (?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,accountId);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while(rs.next()){
+                
+                retrievedAccount.setAccount_id(accountId);
+                retrievedAccount.setUsername(rs.getString("username"));
+                retrievedAccount.setPassword(rs.getString("password"));
+            }
+        } catch(SQLException ex){
+            System.out.println(ex.getMessage());
+        }
+        return retrievedAccount;
+    }
 
 }

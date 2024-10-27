@@ -5,6 +5,8 @@ import io.javalin.http.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +43,9 @@ public class SocialMediaController {
         app.post("/messages", this::postMessageHandler);
         app.get("/messages/{message_id}", this::getMessageById);
         app.delete("/messages/{message_id}", this::deleteMessageById);
+        app.patch("/messages/{message_id}", this::updateMessageById);
+        app.get("accounts/{account_id}/messages", this::getMessagesByAccountHanlder);
+
 
         return app;
     }
@@ -101,7 +106,6 @@ public class SocialMediaController {
 
     private void getMessageById(Context context){
         Message retrievedMessage = messageService.getMessageById(context.pathParam("message_id"));
-
         if(retrievedMessage.getMessage_text() == null){
             System.out.println("empty");
         } else {
@@ -120,5 +124,47 @@ public class SocialMediaController {
             context.json(deletedMessage);
         }
         
+    }
+
+    public void updateMessageById(Context context)throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(context.body(), Message.class);
+        String messageText = message.getMessage_text();
+
+        Message retrievedMessage = messageService.getMessageById(context.pathParam("message_id"));
+        Message updatedMessage = messageService.updateMessage(retrievedMessage,messageText);
+
+        int[] messageIds = messageService.getMessageIds();
+
+        for(int id: messageIds){
+            if(retrievedMessage.getMessage_id() == id){
+                
+                if(updatedMessage == null){
+                    context.status(400);
+                } else {
+                    context.json(updatedMessage);
+                }
+            } else {
+                context.status(400);
+            }
+        }
+    }
+
+    public void getMessagesByAccountHanlder(Context context){
+        
+        Account selectedAccount = accountService.getAccountById(context.pathParam("account_id"));
+        int accountId = selectedAccount.getAccount_id();
+
+        List<Message> allMessages = messageService.getAllMessages();
+        List<Message> allMessagesByUser = new ArrayList<>();
+
+        for(Message message : allMessages){
+            int posted_by = message.getPosted_by();
+
+            if(posted_by == accountId){
+                allMessagesByUser.add(message);
+            }
+        }
+        context.json(allMessagesByUser);
     }
 }

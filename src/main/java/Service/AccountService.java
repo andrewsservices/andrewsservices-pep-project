@@ -5,6 +5,7 @@ import DAO.AccountDAO;
 
 
 import Model.Account;
+import Model.Message;
 
 
 
@@ -22,6 +23,13 @@ public class AccountService {
 
     public List<Account> getAllAccounts(){
         return accountDAO.getAllAccounts();
+    }
+
+    public Account getAccountById(String accountId){
+        int accountIdInt = Integer.parseInt(accountId);
+        Account retrievedAccount = accountDAO.getAccountById(accountIdInt);
+        
+        return retrievedAccount;
     }
 
     public int[] getAccountIds(){
